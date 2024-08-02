@@ -1,14 +1,12 @@
-import os
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, send, join_room, leave_room
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app = Flask(__name__, instance_path=os.path.join(basedir, 'instance'))
+app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance/chat.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chat.db'
 db = SQLAlchemy(app)
 socketio = SocketIO(app)
 
@@ -43,13 +41,8 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
             session['username'] = username
-            print(f"Logged in as {username}")  # デバッグ用
             return redirect(url_for('index'))
-        else:
-            print("Login failed")  # デバッグ用
     return render_template('login.html')
-
-
 
 @app.route('/')
 def index():
